@@ -214,6 +214,44 @@ class _BudgetState extends State<Budget> {
   final panelPowerController = TextEditingController(text: '100');
   final numPanelsController = TextEditingController(text: '1');
 
+  final panelOCVController = TextEditingController(text: '20');
+  final solarChargerMinVoltsController = TextEditingController(text: '30.0');
+  final solarChargerMaxVoltsController = TextEditingController(text: '110.0');
+  var openCircuitVoltageConfig = const Text('OK');
+
+  bool checkOpenCircuitVoltage() {
+    final pv = double.tryParse(panelOCVController.text);
+    final n = double.tryParse(numPanelsController.text);
+    final min = double.tryParse(solarChargerMinVoltsController.text);
+    final max = double.tryParse(solarChargerMaxVoltsController.text);
+    if (pv == null || n == null || min == null || max == null) {
+      setState(() {
+        openCircuitVoltageConfig = const Text('INVALID Config',
+            style: TextStyle(
+              color: Colors.red,
+            ));
+      });
+      return false;
+    }
+    if (pv * n > min && pv * n < max) {
+      setState(() {
+        openCircuitVoltageConfig = const Text('OK',
+            style: TextStyle(
+              color: Colors.green,
+            ));
+      });
+      return true;
+    }
+
+    setState(() {
+      openCircuitVoltageConfig = const Text('Under or Over Voltage',
+          style: TextStyle(
+            color: Colors.red,
+          ));
+    });
+    return false;
+  }
+
   updatePowerCalc() {
     setState(() {
       try {
@@ -234,40 +272,100 @@ class _BudgetState extends State<Budget> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            flex: 1,
-            child: TextField(
-              onSubmitted: (_)=>updatePowerCalc(),
-              controller: panelPowerController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Panel power',
+          panelPowerCalc(),
+          const Divider(),
+          Row(children: [
+            Expanded(
+              flex: 1,
+              child: TextField(
+                onSubmitted: (_) => checkOpenCircuitVoltage(),
+                controller: panelOCVController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Panel Open Circuit Voltage',
+                ),
               ),
             ),
-          ),
-          const Text(' W-peak x '),
-          Expanded(
-            flex: 1,
-            child: TextField(
-              controller: numPanelsController,
-              onSubmitted: (_)=>updatePowerCalc(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'n',
+            Expanded(
+              flex: 1,
+              child: TextField(
+                onSubmitted: (_) => checkOpenCircuitVoltage(),
+                controller: solarChargerMinVoltsController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'minV',
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Text(
-                '= $totalPanelPower W-peak. Est. ${wattHoursPerDay()} Wh/day'),
-          ),
+            Expanded(
+              flex: 1,
+              child: TextField(
+                onSubmitted: (_) => checkOpenCircuitVoltage(),
+                controller: solarChargerMaxVoltsController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                      RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'maxV',
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: openCircuitVoltageConfig,
+            ),
+          ]),
         ],
       ),
+    );
+  }
+
+  Row panelPowerCalc() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextField(
+            onSubmitted: (_) => updatePowerCalc(),
+            controller: panelPowerController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: const InputDecoration(
+              labelText: 'Panel power',
+            ),
+          ),
+        ),
+        const Text(' W-peak x '),
+        Expanded(
+          flex: 1,
+          child: TextField(
+            controller: numPanelsController,
+            onSubmitted: (_) => updatePowerCalc(),
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: const InputDecoration(
+              labelText: 'n',
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 4,
+          child: Text(
+              '= $totalPanelPower W-peak. Est. ${wattHoursPerDay()} Wh/day'),
+        ),
+      ],
     );
   }
 }
