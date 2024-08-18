@@ -240,6 +240,7 @@ class _BudgetState extends State<Budget> {
             flex: 1,
             child: TextField(
               controller: panelPowerController,
+              keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
                 labelText: 'Panel power',
@@ -251,6 +252,7 @@ class _BudgetState extends State<Budget> {
             flex: 1,
             child: TextField(
               controller: numPanelsController,
+              keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
                 labelText: 'n',
