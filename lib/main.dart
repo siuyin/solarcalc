@@ -239,6 +239,7 @@ class _BudgetState extends State<Budget> {
           Expanded(
             flex: 1,
             child: TextField(
+              onSubmitted: (_)=>updatePowerCalc(),
               controller: panelPowerController,
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -252,6 +253,7 @@ class _BudgetState extends State<Budget> {
             flex: 1,
             child: TextField(
               controller: numPanelsController,
+              onSubmitted: (_)=>updatePowerCalc(),
               keyboardType: TextInputType.number,
               inputFormatters: [FilteringTextInputFormatter.digitsOnly],
               decoration: const InputDecoration(
@@ -263,10 +265,6 @@ class _BudgetState extends State<Budget> {
             flex: 4,
             child: Text(
                 '= $totalPanelPower W-peak. Est. ${wattHoursPerDay()} Wh/day'),
-          ),
-          ElevatedButton(
-            onPressed: updatePowerCalc,
-            child: const Text('compute'),
           ),
         ],
       ),
