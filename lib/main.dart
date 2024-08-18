@@ -71,10 +71,11 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: const Column(
-        children: [
-          Text('a'),
-          Text('b'),
+      body: ListView(
+        children: const [
+          Budget(),
+          Solar(),
+          Utility(),
         ],
       ),
       // body: oldMainColoumn(context),
@@ -159,18 +160,89 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class StatefulColumn extends StatefulWidget {
-  const StatefulColumn({super.key});
+class Utility extends StatefulWidget {
+  const Utility({super.key});
 
   @override
-  State<StatefulColumn> createState() => _StatefulColumnState();
+  State<Utility> createState() => _UtilityState();
 }
 
-class _StatefulColumnState extends State<StatefulColumn> {
+class _UtilityState extends State<Utility> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return Container(
+      padding: const EdgeInsets.only(top: 32),
+      child: const Text('Utility'),
+    );
+  }
+}
+
+class Solar extends StatefulWidget {
+  const Solar({super.key});
+
+  @override
+  State<Solar> createState() => _SolarState();
+}
+
+class _SolarState extends State<Solar> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(top: 32),
+      child: const Text('Solar'),
+    );
+  }
+}
+
+class Budget extends StatefulWidget {
+  const Budget({super.key});
+
+  @override
+  State<Budget> createState() => _BudgetState();
+}
+
+class _BudgetState extends State<Budget> {
+  int numPanels = 0;
+  double panelPower = 0;
+  static const peakSolarHoursPerDay = 4.2;
+
+  double wattHoursPerDay(int n, double p) {
+    return n * p * peakSolarHoursPerDay;
+  }
+
+  int numCells = 0;
+  double ampHoursPerCell = 0;
+  static const voltsPerCell = 3.2;
+
+  double battWattHours(int n, double ah) {
+    return n * ah * voltsPerCell;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
+      child: const Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: 'Panel power',
+              ),
+            ),
+          ),
+          Text(' Wh-peak x '),
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                labelText: 'n',
+              ),
+            ),
+          ),
+          Text(' = Wh-peak'),
+        ],
+      ),
+    );
   }
 }
 
