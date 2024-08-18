@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,21 +14,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Solar Power',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
         // TRY THIS: Try running your application with "flutter run". You'll see
         // the application has a purple toolbar. Then, without quitting the app,
         // try changing the seedColor in the colorScheme below to Colors.green
         // and then invoke "hot reload" (save your changes or press the "hot
         // reload" button in a Flutter-supported IDE, or press "r" if you used
         // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
       ),
@@ -202,12 +194,13 @@ class Budget extends StatefulWidget {
 }
 
 class _BudgetState extends State<Budget> {
-  int numPanels = 0;
+  int numPanels = 1;
   double panelPower = 0;
+  double totalPanelPower = 0;
   static const peakSolarHoursPerDay = 4.2;
 
-  double wattHoursPerDay(int n, double p) {
-    return n * p * peakSolarHoursPerDay;
+  double wattHoursPerDay() {
+    return numPanels * panelPower * peakSolarHoursPerDay;
   }
 
   int numCells = 0;
@@ -218,28 +211,59 @@ class _BudgetState extends State<Budget> {
     return n * ah * voltsPerCell;
   }
 
+  final panelPowerController = TextEditingController(text: '100');
+  final numPanelsController = TextEditingController(text: '1');
+
+  updatePowerCalc() {
+    setState(() {
+      try {
+        numPanels = int.parse(numPanelsController.text);
+      } catch (err) {
+        numPanels = 1;
+      }
+      try {
+        panelPower = double.parse(panelPowerController.text);
+      } catch (err) {
+        panelPower = 0;
+      }
+      totalPanelPower = numPanels * panelPower;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
-      child: const Row(
+      child: Row(
         children: [
           Expanded(
+            flex: 1,
             child: TextField(
-              decoration: InputDecoration(
+              onChanged: (_) => updatePowerCalc(),
+              controller: panelPowerController,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
                 labelText: 'Panel power',
               ),
             ),
           ),
-          Text(' Wh-peak x '),
+          const Text(' W-peak x '),
           Expanded(
+            flex: 1,
             child: TextField(
-              decoration: InputDecoration(
+              onChanged: (_) => updatePowerCalc(),
+              controller: numPanelsController,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
                 labelText: 'n',
               ),
             ),
           ),
-          Text(' = Wh-peak'),
+          Expanded(
+            flex:4,
+            child: Text(
+                '= $totalPanelPower W-peak. Est. ${wattHoursPerDay()} Wh/day'),
+          ),
         ],
       ),
     );
