@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
         textTheme: Theme.of(context).textTheme.copyWith(
-              bodyMedium: TextStyle(fontSize: 16),
+              bodyMedium: const TextStyle(fontSize: 16),
             ),
       ),
       home: const MyHomePage(title: "Solar Power calculations"),
@@ -281,7 +281,7 @@ class _BudgetState extends State<Budget> {
           const Divider(),
           ElevatedButton(
             onPressed: compute,
-            child: Text('compute'),
+            child: const Text('compute'),
           ),
         ],
       ),
