@@ -151,9 +151,28 @@ class _BudgetState extends State<Budget> {
       });
       return true;
     }
+    if (pv * n < min) {
+      setState(() {
+        openCircuitVoltageConfig = const Text('Under Voltage',
+            style: TextStyle(
+              color: Colors.red,
+            ));
+      });
+      return false;
+    }
+
+    if(pv*n > max) {
+      setState(() {
+        openCircuitVoltageConfig = const Text('Over Voltage',
+            style: TextStyle(
+              color: Colors.red,
+            ));
+      });
+      return false;
+    }
 
     setState(() {
-      openCircuitVoltageConfig = const Text('Under or Over Voltage',
+      openCircuitVoltageConfig = const Text('Unknown Error',
           style: TextStyle(
             color: Colors.red,
           ));
