@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+const floatPrecision = 4;
+
 void main() {
   runApp(const MyApp());
 }
@@ -100,7 +102,7 @@ class Budget extends StatefulWidget {
 class _BudgetState extends State<Budget> {
   int numPanels = 1;
   double panelPower = 0;
-  double panelOCV = 21.5;
+  double panelOCV = 22.1;
   double totalPanelPower() {
     return numPanels * panelPower;
   }
@@ -128,7 +130,7 @@ class _BudgetState extends State<Budget> {
   final panelPowerController = TextEditingController(text: '100');
   final numPanelsController = TextEditingController(text: '1');
 
-  final panelOCVController = TextEditingController(text: '21.5');
+  final panelOCVController = TextEditingController(text: '22.1');
   final solarChargerMinVoltsController = TextEditingController(text: '30.0');
   final solarChargerMaxVoltsController = TextEditingController(text: '110.0');
   var openCircuitVoltageConfig = const Text('OK');
@@ -163,27 +165,29 @@ class _BudgetState extends State<Budget> {
     if (totalPanelVolts() > solarChargerMinVolts &&
         totalPanelVolts() < solarChargerMaxVolts) {
       setState(() {
-        openCircuitVoltageConfig = const Text('OK',
-            style: TextStyle(
-              color: Colors.green,
-            ));
+        openCircuitVoltageConfig =
+            Text('OK. Vp: ${totalPanelVolts().toStringAsPrecision(floatPrecision)}',
+                style: const TextStyle(
+                  color: Colors.green,
+                ));
       });
       return true;
     }
     if (totalPanelVolts() < solarChargerMinVolts) {
       setState(() {
-        openCircuitVoltageConfig =
-            Text('Vp: ${totalPanelVolts()} < $solarChargerMinVolts',
-                style: const TextStyle(
-                  color: Colors.red,
-                ));
+        openCircuitVoltageConfig = Text(
+            'Vp: ${totalPanelVolts().toStringAsPrecision(floatPrecision)} < $solarChargerMinVolts',
+            style: const TextStyle(
+              color: Colors.red,
+            ));
       });
       return false;
     }
 
     if (totalPanelVolts() > solarChargerMaxVolts) {
       setState(() {
-        openCircuitVoltageConfig =  Text('Vp: ${totalPanelVolts()} > $solarChargerMaxVolts',
+        openCircuitVoltageConfig = Text(
+            'Vp: ${totalPanelVolts().toStringAsPrecision(floatPrecision)} > $solarChargerMaxVolts',
             style: const TextStyle(
               color: Colors.red,
             ));
