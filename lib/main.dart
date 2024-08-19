@@ -38,29 +38,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  void _decrementCounter() {
-    setState(() {
-      _counter--;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: ListView(
@@ -70,86 +53,9 @@ class _MyHomePageState extends State<MyHomePage> {
           Utility(),
         ],
       ),
-      // body: oldMainColoumn(context),
-      // floatingActionButton: fab(context),
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
-      //   tooltip: 'Increment',
-      //   child: const Icon(Icons.remove),
-      // ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  Column oldMainColoumn(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        mainRow(context),
-      ],
-    );
-  }
-
-  Row fab(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
-          onPressed: _incrementCounter,
-          icon: const Icon(Icons.add),
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.resolveWith(
-              (state) {
-                return Theme.of(context).colorScheme.primaryContainer;
-              },
-            ),
-          ),
-        ),
-        IconButton(
-          onPressed: _decrementCounter,
-          icon: const Icon(Icons.remove),
-          style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.resolveWith(
-              (state) {
-                return Theme.of(context).colorScheme.inversePrimary;
-              },
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Row mainRow(BuildContext context) {
-    var infoText = Expanded(
-      flex: 5,
-      child: Text(
-        'You have pushed the button this many times:',
-        style: Theme.of(context).textTheme.headlineSmall,
-      ),
-    );
-    var count = Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Text(
-        '$_counter',
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
-    );
-    var rightText = Expanded(
-      flex: 1,
-      child: Text(
-        'more text',
-        style: Theme.of(context).textTheme.headlineSmall,
-      ),
-    );
-    return Row(
-      children: [
-        infoText,
-        count,
-        rightText,
-      ],
-    );
-  }
 }
 
 class Utility extends StatefulWidget {
