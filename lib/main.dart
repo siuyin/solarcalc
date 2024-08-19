@@ -38,7 +38,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +54,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
 }
 
 class Utility extends StatefulWidget {
@@ -125,6 +123,11 @@ class _BudgetState extends State<Budget> {
   final solarChargerMaxVoltsController = TextEditingController(text: '110.0');
   var openCircuitVoltageConfig = const Text('OK');
 
+  compute() {
+    checkOpenCircuitVoltage();
+    updatePowerCalc();
+  }
+
   bool checkOpenCircuitVoltage() {
     final pv = double.tryParse(panelOCVController.text);
     final n = double.tryParse(numPanelsController.text);
@@ -186,7 +189,7 @@ class _BudgetState extends State<Budget> {
             Expanded(
               flex: 1,
               child: TextField(
-                onSubmitted: (_) => checkOpenCircuitVoltage(),
+                onSubmitted: (_) => compute(),
                 controller: panelOCVController,
                 keyboardType: TextInputType.number,
                 inputFormatters: [
@@ -194,14 +197,14 @@ class _BudgetState extends State<Budget> {
                       RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
                 ],
                 decoration: const InputDecoration(
-                  labelText: 'Panel Open Circuit Voltage',
+                  labelText: 'Panel Voc',
                 ),
               ),
             ),
             Expanded(
               flex: 1,
               child: TextField(
-                onSubmitted: (_) => checkOpenCircuitVoltage(),
+                onSubmitted: (_) => compute(),
                 controller: solarChargerMinVoltsController,
                 keyboardType: TextInputType.number,
                 inputFormatters: [
@@ -244,7 +247,7 @@ class _BudgetState extends State<Budget> {
         Expanded(
           flex: 1,
           child: TextField(
-            onSubmitted: (_) => updatePowerCalc(),
+            onSubmitted: (_) => compute(),
             controller: panelPowerController,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -258,7 +261,7 @@ class _BudgetState extends State<Budget> {
           flex: 1,
           child: TextField(
             controller: numPanelsController,
-            onSubmitted: (_) => updatePowerCalc(),
+            onSubmitted: (_) => compute(),
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             decoration: const InputDecoration(
