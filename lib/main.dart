@@ -100,9 +100,9 @@ class Budget extends StatefulWidget {
 }
 
 class _BudgetState extends State<Budget> {
-  int numPanels = 1;
-  double panelPower = 0;
-  double panelOCV = 22.1;
+  late int numPanels;
+  late double panelPower;
+  late double panelOCV;
   double totalPanelPower() {
     return numPanels * panelPower;
   }
@@ -111,17 +111,20 @@ class _BudgetState extends State<Budget> {
     return numPanels * panelOCV;
   }
 
-  double solarChargerMinVolts = 30.0;
-  double solarChargerMaxVolts = 110.0;
+  late double solarChargerMinVolts;
+  late double solarChargerMaxVolts;
 
   static const peakSolarHoursPerDay = 4.2;
   double wattHoursPerDay() {
     return numPanels * panelPower * peakSolarHoursPerDay;
   }
 
-  int numCells = 0;
-  double ampHoursPerCell = 0;
+  late int numCells;
+  late double ampHoursPerCell;
   static const voltsPerCell = 3.2;
+  double battAmpHours() {
+    return numCells * ampHoursPerCell;
+  }
 
   double battWattHours() {
     return numCells * ampHoursPerCell * voltsPerCell;
@@ -135,9 +138,42 @@ class _BudgetState extends State<Budget> {
   final solarChargerMaxVoltsController = TextEditingController(text: '110.0');
   var openCircuitVoltageConfig = const Text('OK');
 
+  final numCellsController = TextEditingController(text: '8');
+  final cellCapacityController = TextEditingController(text: '100');
+
+  @override
+  void initState() {
+    compute();
+    super.initState();
+  }
+
   compute() {
     checkOpenCircuitVoltage();
     updatePowerCalc();
+    updateBatteryCalc();
+  }
+
+  Text batteryInfo = Text('');
+
+  bool updateBatteryCalc() {
+    final nc = int.tryParse(numCellsController.text);
+    final cc = double.tryParse(cellCapacityController.text);
+    if (nc == null || cc == null){
+      setState(() {
+        batteryInfo = const Text('INVALID Config',
+            style: TextStyle(
+              color: Colors.red,
+            ));
+      });
+      return false;
+    }
+
+    setState(() {
+      numCells = nc;
+      ampHoursPerCell = cc;
+      batteryInfo = Text('${battAmpHours()}Ah ${battWattHours()}Wh');
+    });
+    return true;
   }
 
   bool checkOpenCircuitVoltage() {
@@ -232,6 +268,42 @@ class _BudgetState extends State<Budget> {
           panelPowerCalc(),
           const Divider(),
           panelVoltageCalc(),
+          const Divider(),
+          Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: TextField(
+                  controller: numCellsController,
+                  onSubmitted: (_) => compute(),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: 'num cells',
+                  ),
+                ),
+              ),
+              Expanded(
+                flex:1,
+                child: TextField(
+                  controller: cellCapacityController,
+                  keyboardType: TextInputType.number,
+                  onSubmitted: (_) => compute(),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+                  ],
+                  decoration: const InputDecoration(
+                    labelText: 'cell capacity',
+                  ),
+                ),
+              ),
+              Expanded(
+                flex:2,
+                child: batteryInfo,
+              ),
+            ],
+          ),
         ],
       ),
     );
