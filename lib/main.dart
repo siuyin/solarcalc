@@ -158,7 +158,7 @@ class _BudgetState extends State<Budget> {
   bool updateBatteryCalc() {
     final nc = int.tryParse(numCellsController.text);
     final cc = double.tryParse(cellCapacityController.text);
-    if (nc == null || cc == null){
+    if (nc == null || cc == null) {
       setState(() {
         batteryInfo = const Text('INVALID Config',
             style: TextStyle(
@@ -171,7 +171,10 @@ class _BudgetState extends State<Budget> {
     setState(() {
       numCells = nc;
       ampHoursPerCell = cc;
-      batteryInfo = Text('${battAmpHours()}Ah ${battWattHours()}Wh');
+      batteryInfo = Text(
+        '${battAmpHours()}Ah, ${battWattHours()}Wh, Chg: ${(battWattHours() / wattHoursPerDay()).toStringAsPrecision(2)}h',
+        textAlign: TextAlign.right,
+      );
     });
     return true;
   }
@@ -284,7 +287,7 @@ class _BudgetState extends State<Budget> {
                 ),
               ),
               Expanded(
-                flex:1,
+                flex: 1,
                 child: TextField(
                   controller: cellCapacityController,
                   keyboardType: TextInputType.number,
@@ -299,7 +302,7 @@ class _BudgetState extends State<Budget> {
                 ),
               ),
               Expanded(
-                flex:2,
+                flex: 2,
                 child: batteryInfo,
               ),
             ],
