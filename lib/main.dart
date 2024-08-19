@@ -175,7 +175,7 @@ class _BudgetState extends State<Budget> {
         '${battAmpHours()}Ah, ${battWattHours()}Wh,'
         '\nPmax: ${ampHoursPerCell * voltsPerCell * numCells / 1000}kW '
         'Chg: ${(battWattHours() / wattHoursPerDay()).toStringAsPrecision(2)}d',
-        textAlign: TextAlign.right,
+        textAlign: TextAlign.left,
       );
     });
     return true;
@@ -399,7 +399,7 @@ class _BudgetState extends State<Budget> {
         Expanded(
           flex: 4,
           child: Text(
-            '= ${totalPanelPower()} W-peak.'
+            '${totalPanelPower()} W-peak.'
             '\nEst. ${(wattHoursPerDay() / 1000).toStringAsPrecision(floatPrecision)} kWh/day',
             textAlign: TextAlign.left,
           ),
