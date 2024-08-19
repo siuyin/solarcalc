@@ -274,43 +274,52 @@ class _BudgetState extends State<Budget> {
           const Divider(),
           panelVoltageCalc(),
           const Divider(),
-          Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: TextField(
-                  controller: numCellsController,
-                  onSubmitted: (_) => compute(),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(
-                    labelText: 'num cells',
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: TextField(
-                  controller: cellCapacityController,
-                  keyboardType: TextInputType.number,
-                  onSubmitted: (_) => compute(),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-                  ],
-                  decoration: const InputDecoration(
-                    labelText: 'cell capacity',
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 2,
-                child: batteryInfo,
-              ),
-            ],
+          batteryCapacityCalc(),
+          const Divider(),
+          ElevatedButton(
+            onPressed: compute,
+            child: Text('compute'),
           ),
         ],
       ),
+    );
+  }
+
+  Row batteryCapacityCalc() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: TextField(
+            controller: numCellsController,
+            onSubmitted: (_) => compute(),
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: const InputDecoration(
+              labelText: 'num cells',
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: TextField(
+            controller: cellCapacityController,
+            keyboardType: TextInputType.number,
+            onSubmitted: (_) => compute(),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+            ],
+            decoration: const InputDecoration(
+              labelText: 'cell capacity',
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: batteryInfo,
+        ),
+      ],
     );
   }
 
