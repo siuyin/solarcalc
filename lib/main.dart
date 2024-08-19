@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -225,62 +226,69 @@ class _BudgetState extends State<Budget> {
       padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
       child: Column(
         children: [
+           Text('Energy Budget',
+          style: Theme.of(context).textTheme.headlineSmall,
+          ),
           panelPowerCalc(),
           const Divider(),
-          Row(children: [
-            Expanded(
-              flex: 1,
-              child: TextField(
-                onSubmitted: (_) => compute(),
-                controller: panelOCVController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                      RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-                ],
-                decoration: const InputDecoration(
-                  labelText: 'Panel Voc',
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TextField(
-                onSubmitted: (_) => compute(),
-                controller: solarChargerMinVoltsController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                      RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-                ],
-                decoration: const InputDecoration(
-                  labelText: 'minV',
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: TextField(
-                onSubmitted: (_) => checkOpenCircuitVoltage(),
-                controller: solarChargerMaxVoltsController,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                      RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-                ],
-                decoration: const InputDecoration(
-                  labelText: 'maxV',
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: openCircuitVoltageConfig,
-            ),
-          ]),
+          panelVoltageCalc(),
         ],
       ),
     );
+  }
+
+  Row panelVoltageCalc() {
+    return Row(children: [
+          Expanded(
+            flex: 1,
+            child: TextField(
+              onSubmitted: (_) => compute(),
+              controller: panelOCVController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+              ],
+              decoration: const InputDecoration(
+                labelText: 'Panel Voc',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: TextField(
+              onSubmitted: (_) => compute(),
+              controller: solarChargerMinVoltsController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+              ],
+              decoration: const InputDecoration(
+                labelText: 'minV',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: TextField(
+              onSubmitted: (_) => checkOpenCircuitVoltage(),
+              controller: solarChargerMaxVoltsController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+              ],
+              decoration: const InputDecoration(
+                labelText: 'maxV',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: openCircuitVoltageConfig,
+          ),
+        ]);
   }
 
   Row panelPowerCalc() {
