@@ -100,9 +100,19 @@ class Budget extends StatefulWidget {
 class _BudgetState extends State<Budget> {
   int numPanels = 1;
   double panelPower = 0;
-  double totalPanelPower = 0;
-  static const peakSolarHoursPerDay = 4.2;
+  double panelOCV = 21.5;
+  double totalPanelPower() {
+    return numPanels * panelPower;
+  }
 
+  double totalPanelVolts() {
+    return numPanels * panelOCV;
+  }
+
+  double solarChargerMinVolts = 30.0;
+  double solarChargerMaxVolts = 110.0;
+
+  static const peakSolarHoursPerDay = 4.2;
   double wattHoursPerDay() {
     return numPanels * panelPower * peakSolarHoursPerDay;
   }
@@ -111,14 +121,14 @@ class _BudgetState extends State<Budget> {
   double ampHoursPerCell = 0;
   static const voltsPerCell = 3.2;
 
-  double battWattHours(int n, double ah) {
-    return n * ah * voltsPerCell;
+  double battWattHours() {
+    return numCells * ampHoursPerCell * voltsPerCell;
   }
 
   final panelPowerController = TextEditingController(text: '100');
   final numPanelsController = TextEditingController(text: '1');
 
-  final panelOCVController = TextEditingController(text: '20');
+  final panelOCVController = TextEditingController(text: '21.5');
   final solarChargerMinVoltsController = TextEditingController(text: '30.0');
   final solarChargerMaxVoltsController = TextEditingController(text: '110.0');
   var openCircuitVoltageConfig = const Text('OK');
@@ -130,7 +140,7 @@ class _BudgetState extends State<Budget> {
 
   bool checkOpenCircuitVoltage() {
     final pv = double.tryParse(panelOCVController.text);
-    final n = double.tryParse(numPanelsController.text);
+    final n = int.tryParse(numPanelsController.text);
     final min = double.tryParse(solarChargerMinVoltsController.text);
     final max = double.tryParse(solarChargerMaxVoltsController.text);
     if (pv == null || n == null || min == null || max == null) {
@@ -142,7 +152,16 @@ class _BudgetState extends State<Budget> {
       });
       return false;
     }
-    if (pv * n > min && pv * n < max) {
+
+    setState(() {
+      panelOCV = pv;
+      numPanels = n;
+      solarChargerMinVolts = min;
+      solarChargerMaxVolts = max;
+    });
+
+    if (totalPanelVolts() > solarChargerMinVolts &&
+        totalPanelVolts() < solarChargerMaxVolts) {
       setState(() {
         openCircuitVoltageConfig = const Text('OK',
             style: TextStyle(
@@ -151,20 +170,21 @@ class _BudgetState extends State<Budget> {
       });
       return true;
     }
-    if (pv * n < min) {
+    if (totalPanelVolts() < solarChargerMinVolts) {
       setState(() {
-        openCircuitVoltageConfig = const Text('Under Voltage',
-            style: TextStyle(
-              color: Colors.red,
-            ));
+        openCircuitVoltageConfig =
+            Text('Vp: ${totalPanelVolts()} < $solarChargerMinVolts',
+                style: const TextStyle(
+                  color: Colors.red,
+                ));
       });
       return false;
     }
 
-    if(pv*n > max) {
+    if (totalPanelVolts() > solarChargerMaxVolts) {
       setState(() {
-        openCircuitVoltageConfig = const Text('Over Voltage',
-            style: TextStyle(
+        openCircuitVoltageConfig =  Text('Vp: ${totalPanelVolts()} > $solarChargerMaxVolts',
+            style: const TextStyle(
               color: Colors.red,
             ));
       });
@@ -192,7 +212,6 @@ class _BudgetState extends State<Budget> {
       } catch (err) {
         panelPower = 0;
       }
-      totalPanelPower = numPanels * panelPower;
     });
   }
 
@@ -291,7 +310,7 @@ class _BudgetState extends State<Budget> {
         Expanded(
           flex: 4,
           child: Text(
-              '= $totalPanelPower W-peak. Est. ${wattHoursPerDay()} Wh/day'),
+              '= ${totalPanelPower()} W-peak. Est. ${wattHoursPerDay()} Wh/day'),
         ),
       ],
     );
