@@ -153,7 +153,7 @@ class _BudgetState extends State<Budget> {
     updateBatteryCalc();
   }
 
-  Text batteryInfo = Text('');
+  Text batteryInfo = const Text('');
 
   bool updateBatteryCalc() {
     final nc = int.tryParse(numCellsController.text);
@@ -172,7 +172,9 @@ class _BudgetState extends State<Budget> {
       numCells = nc;
       ampHoursPerCell = cc;
       batteryInfo = Text(
-        '${battAmpHours()}Ah, ${battWattHours()}Wh, Chg: ${(battWattHours() / wattHoursPerDay()).toStringAsPrecision(2)}h',
+        '${battAmpHours()}Ah, ${battWattHours()}Wh,'
+        '\nPmax: ${ampHoursPerCell * voltsPerCell * numCells / 1000}kW '
+        'Chg: ${(battWattHours() / wattHoursPerDay()).toStringAsPrecision(2)}d',
         textAlign: TextAlign.right,
       );
     });
@@ -397,8 +399,9 @@ class _BudgetState extends State<Budget> {
         Expanded(
           flex: 4,
           child: Text(
-            '= ${totalPanelPower()} W-peak. Est. ${wattHoursPerDay().toStringAsPrecision(floatPrecision)} Wh/day',
-            textAlign: TextAlign.right,
+            '= ${totalPanelPower()} W-peak.'
+            '\nEst. ${(wattHoursPerDay() / 1000).toStringAsPrecision(floatPrecision)} kWh/day',
+            textAlign: TextAlign.left,
           ),
         ),
       ],
