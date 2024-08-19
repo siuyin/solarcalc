@@ -24,6 +24,9 @@ class MyApp extends StatelessWidget {
         // the command line to start the app).
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         useMaterial3: true,
+        textTheme: Theme.of(context).textTheme.copyWith(
+              bodyMedium: TextStyle(fontSize: 16),
+            ),
       ),
       home: const MyHomePage(title: "Solar Power calculations"),
     );
