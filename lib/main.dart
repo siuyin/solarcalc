@@ -113,8 +113,17 @@ class _SolarState extends State<Solar> {
     });
   }
 
-  static final list = <String>['one', 'two', 'three'];
-  String ddvalue = list.first;
+  static final list = <(String, double)>[
+    ('1mm²', 1.0),
+    ('1.5mm²', 1.5),
+    ('2.5mm²', 2.5),
+    ('4mm²', 4.0),
+    ('16AWG',1.31),
+    ('14AWG', 2.08),
+    ('12AWG', 3.31),
+    ('10AWG', 5.26),
+  ];
+  double ddDbl = list.first.$2;
 
   @override
   Widget build(BuildContext context) {
@@ -123,17 +132,17 @@ class _SolarState extends State<Solar> {
       child: Row(
         children: [
           DropdownButton(
-            value: ddvalue,
+            value: ddDbl,
             items: list.map<DropdownMenuItem>((val) {
               return DropdownMenuItem(
-                value: val,
-                child: Text(val),
+                value: val.$2,
+                child: Text(val.$1),
               );
             }).toList(),
             onChanged: (val) {
               setState(() {
-                ddvalue = val!;
-                gerbau = 'dropped down: $ddvalue';
+                ddDbl = val!;
+                gerbau = 'dropped down: $ddDbl';
               });
             },
           ),
