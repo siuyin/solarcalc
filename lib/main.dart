@@ -206,7 +206,7 @@ class _BudgetState extends State<Budget> {
     updateBatteryCalc();
   }
 
-  Text batteryInfo = const Text('');
+  Text batteryInfo = const Text('batt info');
 
   bool updateBatteryCalc() {
     final nc = int.tryParse(numCellsController.text);
@@ -224,6 +224,7 @@ class _BudgetState extends State<Budget> {
     setState(() {
       numCells = nc;
       ampHoursPerCell = cc;
+
       batteryInfo = Text(
         '${battAmpHours()}Ah, ${battWattHours()}Wh,'
         '\nPmax: ${ampHoursPerCell * voltsPerCell * numCells / 1000}kW '
@@ -231,6 +232,9 @@ class _BudgetState extends State<Budget> {
         textAlign: TextAlign.left,
       );
     });
+    
+    box.put('numCells', numCells);
+    box.put('ampHoursPerCell', ampHoursPerCell);
     return true;
   }
 
