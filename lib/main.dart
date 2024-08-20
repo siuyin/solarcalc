@@ -92,11 +92,39 @@ class Solar extends StatefulWidget {
 }
 
 class _SolarState extends State<Solar> {
+  dynamic box;
+  String gerbau = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  _init() async {
+    await Hive.initFlutter();
+    box = await Hive.openBox('solar');
+    box.put('gerbau', 'terpau');
+  }
+
+  _terp() {
+    setState(() {
+      gerbau = '${box.get('gerbau')}: ${DateTime.now().toString()}';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 32),
-      child: const Text('Solar'),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text('Solar: $gerbau'),
+          ),
+          ElevatedButton(onPressed: _terp, child: const Text('init'))
+        ],
+      ),
     );
   }
 }
@@ -232,7 +260,7 @@ class _BudgetState extends State<Budget> {
         textAlign: TextAlign.left,
       );
     });
-    
+
     box.put('numCells', numCells);
     box.put('ampHoursPerCell', ampHoursPerCell);
     return true;
