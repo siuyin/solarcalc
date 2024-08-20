@@ -111,7 +111,7 @@ class Budget extends StatefulWidget {
 class _BudgetState extends State<Budget> {
   int numPanels = 1;
   double panelPower = 100;
-  late double panelOCV;
+  double panelOCV = 22.1;
   double totalPanelPower() {
     return numPanels * panelPower;
   }
@@ -120,16 +120,16 @@ class _BudgetState extends State<Budget> {
     return numPanels * panelOCV;
   }
 
-  late double solarChargerMinVolts;
-  late double solarChargerMaxVolts;
+  double solarChargerMinVolts = 30.0;
+  double solarChargerMaxVolts = 100.0;
 
   static const peakSolarHoursPerDay = 4.2;
   double wattHoursPerDay() {
     return numPanels * panelPower * peakSolarHoursPerDay;
   }
 
-  late int numCells;
-  late double ampHoursPerCell;
+  int numCells = 4;
+  double ampHoursPerCell = 100.0;
   static const voltsPerCell = 3.2;
   double battAmpHours() {
     return numCells * ampHoursPerCell;
@@ -142,13 +142,13 @@ class _BudgetState extends State<Budget> {
   final panelPowerController = TextEditingController();
   final numPanelsController = TextEditingController();
 
-  final panelOCVController = TextEditingController(text: '22.1');
-  final solarChargerMinVoltsController = TextEditingController(text: '30.0');
-  final solarChargerMaxVoltsController = TextEditingController(text: '110.0');
+  final panelOCVController = TextEditingController();
+  final solarChargerMinVoltsController = TextEditingController();
+  final solarChargerMaxVoltsController = TextEditingController();
   var openCircuitVoltageConfig = const Text('OK');
 
-  final numCellsController = TextEditingController(text: '8');
-  final cellCapacityController = TextEditingController(text: '100');
+  final numCellsController = TextEditingController();
+  final cellCapacityController = TextEditingController();
   dynamic box;
 
   @override
@@ -166,22 +166,38 @@ class _BudgetState extends State<Budget> {
     panelPowerController.text = box.get('panelPower').toString();
 
     setIfEmpty('numPanels', numPanels);
+    numPanels = box.get('numPanels');
     numPanelsController.text = box.get('numPanels').toString();
+
+    setIfEmpty('panelOCV', panelOCV);
+    panelOCV = box.get('panelOCV');
+    panelOCVController.text = box.get('panelOCV').toString();
+
+    setIfEmpty('solarChargerMinVolts', solarChargerMinVolts);
+    solarChargerMinVolts = box.get('solarChargerMinVolts');
+    solarChargerMinVoltsController.text =
+        box.get('solarChargerMinVolts').toString();
+
+    setIfEmpty('solarChargerMaxVolts', solarChargerMaxVolts);
+    solarChargerMaxVolts = box.get('solarChargerMaxVolts');
+    solarChargerMaxVoltsController.text =
+        box.get('solarChargerMaxVolts').toString();
+
+    setIfEmpty('numCells', numCells);
+    numCells = box.get('numCells');
+    numCellsController.text = box.get('numCells').toString();
+
+    setIfEmpty('ampHoursPerCell', ampHoursPerCell);
+    ampHoursPerCell = box.get('ampHoursPerCell');
+    cellCapacityController.text = box.get('ampHoursPerCell').toString();
+
     compute();
   }
 
   setIfEmpty(String key, dynamic value) {
-    if (box == null) {
-      debugPrint('null box');
-      return;
-    }
-    if (box.get(key) == null) {
-      box.put(key, value);
-      debugPrint('$key set to $value');
-      return;
-    }
+    if (box.get(key) != null) return;
     box.put(key, value);
-    debugPrint('$key updated to $value');
+    debugPrint('set $key to $value');
   }
 
   compute() {
@@ -235,9 +251,13 @@ class _BudgetState extends State<Budget> {
 
     setState(() {
       panelOCV = pv;
+      box.put('panelOCV', panelOCV);
       numPanels = n;
+      box.put('numPanels', numPanels);
       solarChargerMinVolts = min;
+      box.put('solarChargerMinVolts', solarChargerMinVolts);
       solarChargerMaxVolts = max;
+      box.put('solarChargerMaxVolts', solarChargerMaxVolts);
     });
 
     if (totalPanelVolts() > solarChargerMinVolts &&
@@ -282,18 +302,12 @@ class _BudgetState extends State<Budget> {
     return false;
   }
 
-  updatePowerCalc() async {
+  updatePowerCalc() {
     setState(() {
-      try {
-        numPanels = int.parse(numPanelsController.text);
-      } catch (err) {
-        numPanels = 1;
-      }
-      try {
-        panelPower = double.parse(panelPowerController.text);
-      } catch (err) {
-        panelPower = 0;
-      }
+      numPanels = int.tryParse(numPanelsController.text) ?? 1;
+      box.put('numPanels', numPanels);
+      panelPower = double.tryParse(panelPowerController.text) ?? 0.0;
+      box.put('panelPower', panelPower);
     });
   }
 
