@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 const floatPrecision = 4;
 
@@ -43,6 +44,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,8 +109,8 @@ class Budget extends StatefulWidget {
 }
 
 class _BudgetState extends State<Budget> {
-  late int numPanels;
-  late double panelPower;
+  int numPanels = 1;
+  double panelPower = 100;
   late double panelOCV;
   double totalPanelPower() {
     return numPanels * panelPower;
@@ -133,8 +139,8 @@ class _BudgetState extends State<Budget> {
     return numCells * ampHoursPerCell * voltsPerCell;
   }
 
-  final panelPowerController = TextEditingController(text: '100');
-  final numPanelsController = TextEditingController(text: '1');
+  final panelPowerController = TextEditingController();
+  final numPanelsController = TextEditingController();
 
   final panelOCVController = TextEditingController(text: '22.1');
   final solarChargerMinVoltsController = TextEditingController(text: '30.0');
@@ -143,11 +149,39 @@ class _BudgetState extends State<Budget> {
 
   final numCellsController = TextEditingController(text: '8');
   final cellCapacityController = TextEditingController(text: '100');
+  dynamic box;
 
   @override
   void initState() {
-    compute();
     super.initState();
+    _init();
+  }
+
+  _init() async {
+    await Hive.initFlutter();
+    box = await Hive.openBox('solar');
+
+    setIfEmpty('panelPower', panelPower);
+    panelPower = box.get('panelPower');
+    panelPowerController.text = box.get('panelPower').toString();
+
+    setIfEmpty('numPanels', numPanels);
+    numPanelsController.text = box.get('numPanels').toString();
+    compute();
+  }
+
+  setIfEmpty(String key, dynamic value) {
+    if (box == null) {
+      debugPrint('null box');
+      return;
+    }
+    if (box.get(key) == null) {
+      box.put(key, value);
+      debugPrint('$key set to $value');
+      return;
+    }
+    box.put(key, value);
+    debugPrint('$key updated to $value');
   }
 
   compute() {
@@ -248,7 +282,7 @@ class _BudgetState extends State<Budget> {
     return false;
   }
 
-  updatePowerCalc() {
+  updatePowerCalc() async {
     setState(() {
       try {
         numPanels = int.parse(numPanelsController.text);
