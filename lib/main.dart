@@ -113,12 +113,30 @@ class _SolarState extends State<Solar> {
     });
   }
 
+  static final list = <String>['one', 'two', 'three'];
+  String ddvalue = list.first;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 32),
       child: Row(
         children: [
+          DropdownButton(
+            value: ddvalue,
+            items: list.map<DropdownMenuItem>((val) {
+              return DropdownMenuItem(
+                value: val,
+                child: Text(val),
+              );
+            }).toList(),
+            onChanged: (val) {
+              setState(() {
+                ddvalue = val!;
+                gerbau = 'dropped down: $ddvalue';
+              });
+            },
+          ),
           Expanded(
             child: Text('Solar: $gerbau'),
           ),
