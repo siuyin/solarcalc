@@ -93,7 +93,7 @@ class Solar extends StatefulWidget {
 
 class _SolarState extends State<Solar> {
   dynamic box;
-  String gerbau = '';
+  String outputText = '';
 
   @override
   void initState() {
@@ -144,84 +144,94 @@ class _SolarState extends State<Solar> {
   final cableLengthController = TextEditingController();
   final numConductorsController = TextEditingController();
 
-  double temperatureCorrectedCopperResistivity(){
-    return 17.24e-9*(1+3.93e-3*(cableTemp-20.0));
+  double temperatureCorrectedCopperResistivity() {
+    return 17.24e-9 * (1 + 3.93e-3 * (cableTemp - 20.0));
   }
-  double singleConductorResistance(){
-    return temperatureCorrectedCopperResistivity()*cableLength/cableCrossSection*1e6;
+
+  double singleConductorResistance() {
+    return temperatureCorrectedCopperResistivity() *
+        cableLength /
+        cableCrossSection *
+        1e6;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 32),
-      child: Row(
-        // crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          const Text('Cable:'),
-          DropdownButton(
-            value: cableCrossSection,
-            items: list.map<DropdownMenuItem>((val) {
-              return DropdownMenuItem(
-                value: val.$2,
-                child: Text(val.$1),
-              );
-            }).toList(),
-            onChanged: (val) {
-              setState(() {
-                cableCrossSection = val!;
-                compute();
-              });
-            },
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-          ),
-          SizedBox(
-            width: 64,
-            child: TextField(
-              controller: cableLengthController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Length (m)',
+    return Column(
+      children: [
+        Row(
+          // crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            const Text('Cable:'),
+            DropdownButton(
+              value: cableCrossSection,
+              items: list.map<DropdownMenuItem>((val) {
+                return DropdownMenuItem(
+                  value: val.$2,
+                  child: Text(val.$1),
+                );
+              }).toList(),
+              onChanged: (val) {
+                setState(() {
+                  cableCrossSection = val!;
+                  compute();
+                });
+              },
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+            ),
+            SizedBox(
+              width: 64,
+              child: TextField(
+                controller: cableLengthController,
+                onSubmitted: (_) => compute(),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  labelText: 'Length (m)',
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            width: 64,
-            child: TextField(
-              controller: cableTempController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: '°C',
+            SizedBox(
+              width: 64,
+              child: TextField(
+                controller: cableTempController,
+                onSubmitted: (_) => compute(),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  labelText: '°C',
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            width: 64,
-            child: TextField(
-              controller: numConductorsController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'num.',
+            SizedBox(
+              width: 64,
+              child: TextField(
+                controller: numConductorsController,
+                onSubmitted: (_) => compute(),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  labelText: 'num.',
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: Text(gerbau),
-          ),
-        ],
-      ),
+          ],
+        ),
+         Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(outputText),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
   compute() {
     setState(() {
-      box.put('cableCrossSection',cableCrossSection);
+      box.put('cableCrossSection', cableCrossSection);
 
       cableLength = double.tryParse(cableLengthController.text) ?? cableLength;
       box.put('cableLength', cableLength);
@@ -229,10 +239,12 @@ class _SolarState extends State<Solar> {
       cableLength = double.tryParse(cableTempController.text) ?? cableTemp;
       box.put('cableTemp', cableLength);
 
-      numConductors= int.tryParse(numConductorsController.text) ?? numConductors;
+      numConductors =
+          int.tryParse(numConductorsController.text) ?? numConductors;
       box.put('numConductors', numConductors);
 
-      gerbau = 'Single conductor resistance: ${singleConductorResistance().toStringAsPrecision(3)}Ω';
+      outputText =
+          'Single conductor resistance: ${singleConductorResistance().toStringAsPrecision(3)}Ω';
     });
   }
 }
