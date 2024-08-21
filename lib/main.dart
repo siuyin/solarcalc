@@ -125,6 +125,9 @@ class _SolarState extends State<Solar> {
   ];
   double cableCrossSection = list.first.$2;
 
+  final cableTempController = TextEditingController();
+  final cableLengthController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -146,7 +149,31 @@ class _SolarState extends State<Solar> {
                 gerbau = 'dropped down: $cableCrossSection';
               });
             },
-            padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+          ),
+          SizedBox(
+            width: 64,
+            child: TextField(
+              controller: cableLengthController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'Length (m)',
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 64,
+            child: TextField(
+              controller: cableTempController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: '°C',
+              ),
+            ),
           ),
           Expanded(
             child: Text('Solar: $gerbau'),
@@ -156,6 +183,8 @@ class _SolarState extends State<Solar> {
       ),
     );
   }
+
+  compute() {}
 }
 
 class Budget extends StatefulWidget {
