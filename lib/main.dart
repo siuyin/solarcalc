@@ -111,7 +111,9 @@ class _SolarState extends State<Solar> {
     await Hive.initFlutter();
     box = await Hive.openBox('solar');
     setIfEmpty('cableCrossSection', 2.5);
-    cableCrossSection = box.get('cableCrossSection');
+    setState(() {
+      cableCrossSection = box.get('cableCrossSection');
+    });
 
     setIfEmpty('cableLength', cableLength);
     cableLengthController.text = box.get('cableLength').toString();
@@ -429,7 +431,7 @@ class _BudgetState extends State<Budget> {
       solarChargerMaxVolts = max;
       box.put('solarChargerMaxVolts', solarChargerMaxVolts);
 
-      box.put('panelMaxAmps',panelMaxAmps());
+      box.put('panelMaxAmps', panelMaxAmps());
     });
 
     if (totalPanelVolts() > solarChargerMinVolts &&
