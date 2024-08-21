@@ -233,18 +233,18 @@ class _SolarState extends State<Solar> {
     setState(() {
       box.put('cableCrossSection', cableCrossSection);
 
-      cableLength = double.tryParse(cableLengthController.text) ?? cableLength;
+      cableLength = double.tryParse(cableLengthController.text)?? cableLength ;
       box.put('cableLength', cableLength);
 
-      cableLength = double.tryParse(cableTempController.text) ?? cableTemp;
-      box.put('cableTemp', cableLength);
+      cableTemp = double.tryParse(cableTempController.text) ?? cableTemp;
+      box.put('cableTemp', cableTemp);
 
       numConductors =
           int.tryParse(numConductorsController.text) ?? numConductors;
       box.put('numConductors', numConductors);
 
       outputText =
-          'Single conductor resistance: ${singleConductorResistance().toStringAsPrecision(3)}Ω';
+          'Single ${cableLength}m conductor resistance:  ${singleConductorResistance().toStringAsPrecision(3)}Ω';
     });
   }
 }
