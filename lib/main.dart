@@ -101,16 +101,28 @@ class _SolarState extends State<Solar> {
     _init();
   }
 
+  setIfEmpty(String key, dynamic value) {
+    if (box.get(key) != null) return;
+    box.put(key, value);
+    debugPrint('set $key to $value');
+  }
+
   _init() async {
     await Hive.initFlutter();
     box = await Hive.openBox('solar');
-    box.put('gerbau', 'terpau');
-  }
+    setIfEmpty('cableCrossSection', 2.5);
+    cableCrossSection = box.get('cableCrossSection');
 
-  _terp() {
-    setState(() {
-      gerbau = '${box.get('gerbau')}: ${DateTime.now().toString()}';
-    });
+    setIfEmpty('cableLength', cableLength);
+    cableLengthController.text = box.get('cableLength').toString();
+
+    setIfEmpty('cableTemp', cableTemp);
+    cableTempController.text = box.get('cableTemp').toString();
+
+    setIfEmpty('numConductors', numConductors);
+    numConductorsController.text = box.get('numConductors').toString();
+
+    box.put('gerbau', 'terpau');
   }
 
   static final list = <(String, double)>[
@@ -124,15 +136,27 @@ class _SolarState extends State<Solar> {
     ('10AWG', 5.26),
   ];
   double cableCrossSection = list.first.$2;
+  double cableTemp = 30.0;
+  double cableLength = 10.0;
+  int numConductors = 2;
 
   final cableTempController = TextEditingController();
   final cableLengthController = TextEditingController();
+  final numConductorsController = TextEditingController();
+
+  double temperatureCorrectedCopperResistivity(){
+    return 17.24e-9*(1+3.93e-3*(cableTemp-20.0));
+  }
+  double singleConductorResistance(){
+    return temperatureCorrectedCopperResistivity()*cableLength/cableCrossSection*1e6;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(top: 32),
       child: Row(
+        // crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           const Text('Cable:'),
           DropdownButton(
@@ -146,7 +170,7 @@ class _SolarState extends State<Solar> {
             onChanged: (val) {
               setState(() {
                 cableCrossSection = val!;
-                gerbau = 'dropped down: $cableCrossSection';
+                compute();
               });
             },
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
@@ -175,16 +199,42 @@ class _SolarState extends State<Solar> {
               ),
             ),
           ),
-          Expanded(
-            child: Text('Solar: $gerbau'),
+          SizedBox(
+            width: 64,
+            child: TextField(
+              controller: numConductorsController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'num.',
+              ),
+            ),
           ),
-          ElevatedButton(onPressed: _terp, child: const Text('init'))
+          Expanded(
+            child: Text(gerbau),
+          ),
         ],
       ),
     );
   }
 
-  compute() {}
+  compute() {
+    setState(() {
+      box.put('cableCrossSection',cableCrossSection);
+
+      cableLength = double.tryParse(cableLengthController.text) ?? cableLength;
+      box.put('cableLength', cableLength);
+
+      cableLength = double.tryParse(cableTempController.text) ?? cableTemp;
+      box.put('cableTemp', cableLength);
+
+      numConductors= int.tryParse(numConductorsController.text) ?? numConductors;
+      box.put('numConductors', numConductors);
+
+      gerbau = 'Single conductor resistance: ${singleConductorResistance().toStringAsPrecision(3)}Ω';
+    });
+  }
 }
 
 class Budget extends StatefulWidget {
