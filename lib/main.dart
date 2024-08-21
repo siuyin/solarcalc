@@ -291,7 +291,7 @@ class _BudgetState extends State<Budget> {
   double ampHoursPerCell = 100.0;
   static const voltsPerCell = 3.2;
   double battAmpHours() {
-    return numCells * ampHoursPerCell;
+    return ampHoursPerCell;
   }
 
   double battWattHours() {
@@ -375,6 +375,10 @@ class _BudgetState extends State<Budget> {
     return ampHoursPerCell * 1.0; // 1.0C
   }
 
+  double totalBatteryVolts(){
+    return voltsPerCell*numCells;
+  }
+
   bool updateBatteryCalc() {
     final nc = int.tryParse(numCellsController.text);
     final cc = double.tryParse(cellCapacityController.text);
@@ -394,7 +398,7 @@ class _BudgetState extends State<Budget> {
       box.put('battMaxAmps', battMaxAmps());
 
       batteryInfo = Text(
-        '${battAmpHours()}Ah, ${battWattHours()}Wh,'
+        '${totalBatteryVolts()}V ${battAmpHours()}Ah, ${battWattHours()}Wh,'
         '\nPmax: ${battMaxPower() / 1000}kW '
         'Chg: ${(battWattHours() / wattHoursPerDay()).toStringAsPrecision(2)}d',
         textAlign: TextAlign.left,
