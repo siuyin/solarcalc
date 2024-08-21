@@ -131,8 +131,8 @@ class _SolarState extends State<Solar> {
       padding: const EdgeInsets.only(top: 32),
       child: Row(
         children: [
+          const Text('Cable:'),
           DropdownButton(
-            hint: const Text('Cable cross section'),
             value: cableCrossSection,
             items: list.map<DropdownMenuItem>((val) {
               return DropdownMenuItem(
@@ -146,6 +146,7 @@ class _SolarState extends State<Solar> {
                 gerbau = 'dropped down: $cableCrossSection';
               });
             },
+            padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
           ),
           Expanded(
             child: Text('Solar: $gerbau'),
