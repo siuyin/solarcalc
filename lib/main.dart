@@ -217,7 +217,7 @@ class _SolarState extends State<Solar> {
             ),
           ],
         ),
-         Row(
+        Row(
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -229,11 +229,15 @@ class _SolarState extends State<Solar> {
     );
   }
 
+  double powerLoss(double i, double r, int n) {
+    return i * i * r * n;
+  }
+
   compute() {
     setState(() {
       box.put('cableCrossSection', cableCrossSection);
 
-      cableLength = double.tryParse(cableLengthController.text)?? cableLength ;
+      cableLength = double.tryParse(cableLengthController.text) ?? cableLength;
       box.put('cableLength', cableLength);
 
       cableTemp = double.tryParse(cableTempController.text) ?? cableTemp;
@@ -244,7 +248,8 @@ class _SolarState extends State<Solar> {
       box.put('numConductors', numConductors);
 
       outputText =
-          'Single ${cableLength}m conductor resistance:  ${singleConductorResistance().toStringAsPrecision(3)}Ω';
+          'Single ${cableLength}m conductor resistance:  ${singleConductorResistance().toStringAsPrecision(3)}Ω'
+          '\nGiven max panel current: ${box.get('panelMaxAmps').toStringAsFixed(1)}A, power loss for $numConductors conductors: ${powerLoss(box.get('panelMaxAmps'), singleConductorResistance(), numConductors).toStringAsFixed(1)}W';
     });
   }
 }
@@ -266,6 +271,10 @@ class _BudgetState extends State<Budget> {
 
   double totalPanelVolts() {
     return numPanels * panelOCV;
+  }
+
+  double panelMaxAmps() {
+    return totalPanelPower() / totalPanelVolts();
   }
 
   double solarChargerMinVolts = 30.0;
@@ -356,6 +365,14 @@ class _BudgetState extends State<Budget> {
 
   Text batteryInfo = const Text('batt info');
 
+  double battMaxPower() {
+    return ampHoursPerCell * voltsPerCell * numCells;
+  }
+
+  double battMaxAmps() {
+    return ampHoursPerCell * 1.0; // 1.0C
+  }
+
   bool updateBatteryCalc() {
     final nc = int.tryParse(numCellsController.text);
     final cc = double.tryParse(cellCapacityController.text);
@@ -372,10 +389,11 @@ class _BudgetState extends State<Budget> {
     setState(() {
       numCells = nc;
       ampHoursPerCell = cc;
+      box.put('battMaxAmps', battMaxAmps());
 
       batteryInfo = Text(
         '${battAmpHours()}Ah, ${battWattHours()}Wh,'
-        '\nPmax: ${ampHoursPerCell * voltsPerCell * numCells / 1000}kW '
+        '\nPmax: ${battMaxPower() / 1000}kW '
         'Chg: ${(battWattHours() / wattHoursPerDay()).toStringAsPrecision(2)}d',
         textAlign: TextAlign.left,
       );
@@ -410,6 +428,8 @@ class _BudgetState extends State<Budget> {
       box.put('solarChargerMinVolts', solarChargerMinVolts);
       solarChargerMaxVolts = max;
       box.put('solarChargerMaxVolts', solarChargerMaxVolts);
+
+      box.put('panelMaxAmps',panelMaxAmps());
     });
 
     if (totalPanelVolts() > solarChargerMinVolts &&
