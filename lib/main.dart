@@ -118,12 +118,12 @@ class _SolarState extends State<Solar> {
     ('1.5mm²', 1.5),
     ('2.5mm²', 2.5),
     ('4mm²', 4.0),
-    ('16AWG',1.31),
+    ('16AWG', 1.31),
     ('14AWG', 2.08),
     ('12AWG', 3.31),
     ('10AWG', 5.26),
   ];
-  double ddDbl = list.first.$2;
+  double cableCrossSection = list.first.$2;
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +132,8 @@ class _SolarState extends State<Solar> {
       child: Row(
         children: [
           DropdownButton(
-            value: ddDbl,
+            hint: const Text('Cable cross section'),
+            value: cableCrossSection,
             items: list.map<DropdownMenuItem>((val) {
               return DropdownMenuItem(
                 value: val.$2,
@@ -141,8 +142,8 @@ class _SolarState extends State<Solar> {
             }).toList(),
             onChanged: (val) {
               setState(() {
-                ddDbl = val!;
-                gerbau = 'dropped down: $ddDbl';
+                cableCrossSection = val!;
+                gerbau = 'dropped down: $cableCrossSection';
               });
             },
           ),
