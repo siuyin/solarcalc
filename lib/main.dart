@@ -221,9 +221,11 @@ class _SolarState extends State<Solar> {
         ),
         Row(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(outputText),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(outputText),
+              ),
             ),
           ],
         ),
@@ -375,8 +377,8 @@ class _BudgetState extends State<Budget> {
     return ampHoursPerCell * 1.0; // 1.0C
   }
 
-  double totalBatteryVolts(){
-    return voltsPerCell*numCells;
+  double totalBatteryVolts() {
+    return voltsPerCell * numCells;
   }
 
   bool updateBatteryCalc() {
