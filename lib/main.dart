@@ -115,7 +115,32 @@ class _EnergyBudgetState extends State<EnergyBudget> {
 
   final numCellsController = TextEditingController();
   final cellCapacityController = TextEditingController();
+
   dynamic box;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
+      child: Column(
+        children: [
+          const Heading(title: 'Energy Budget'),
+          panelPowerCalc(),
+          const Divider(),
+          panelVoltageCalc(),
+          const Divider(),
+          batteryCapacityCalc(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: compute,
+              child: const Text('compute'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -292,33 +317,6 @@ class _EnergyBudgetState extends State<EnergyBudget> {
       panelPower = double.tryParse(panelPowerController.text) ?? 0.0;
       box.put('panelPower', panelPower);
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(8, 16, 8, 0),
-      child: Column(
-        children: [
-          Text(
-            'Energy Budget',
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          panelPowerCalc(),
-          const Divider(),
-          panelVoltageCalc(),
-          const Divider(),
-          batteryCapacityCalc(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: compute,
-              child: const Text('compute'),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Row batteryCapacityCalc() {
@@ -537,10 +535,7 @@ class _SolarCableState extends State<SolarCable> {
     return Column(
       children: [
         const Divider(),
-        Text(
-          'Solar Cable',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
+        const Heading(title: 'Solar Cable'),
         Row(
           // crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -657,7 +652,21 @@ class _SolarCableState extends State<SolarCable> {
   }
 }
 
+class Heading extends StatelessWidget {
+  const Heading({
+    super.key,
+    required this.title,
+  });
+  final String title;
 
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.headlineSmall,
+    );
+  }
+}
 
 class BatteryCable extends StatefulWidget {
   const BatteryCable({super.key});
@@ -669,9 +678,10 @@ class BatteryCable extends StatefulWidget {
 class _BatteryCableState extends State<BatteryCable> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 32),
-      child: const Text('Utility'),
+    return const Column(
+      children: [
+        Heading(title: 'Battery Cable'),
+      ],
     );
   }
 }
