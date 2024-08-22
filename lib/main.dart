@@ -174,7 +174,6 @@ class _SolarState extends State<Solar> {
         Row(
           // crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            const Text('Cable:'),
             DropdownButton(
               value: cableCrossSection,
               items: list.map<DropdownMenuItem>((val) {
