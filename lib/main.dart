@@ -124,6 +124,9 @@ class _SolarState extends State<Solar> {
     setIfEmpty('numConductors', numConductors);
     numConductorsController.text = box.get('numConductors').toString();
 
+    setIfEmpty('iSC', iSC);
+    iSCController.text = box.get('iSC').toString();
+
     box.put('gerbau', 'terpau');
   }
 
@@ -141,10 +144,12 @@ class _SolarState extends State<Solar> {
   double cableTemp = 30.0;
   double cableLength = 10.0;
   int numConductors = 2;
+  double iSC = 5.5;
 
   final cableTempController = TextEditingController();
   final cableLengthController = TextEditingController();
   final numConductorsController = TextEditingController();
+  final iSCController = TextEditingController();
 
   double temperatureCorrectedCopperResistivity() {
     return 17.24e-9 * (1 + 3.93e-3 * (cableTemp - 20.0));
@@ -161,6 +166,11 @@ class _SolarState extends State<Solar> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const Divider(),
+        Text(
+          'Solar Cable',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
         Row(
           // crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -206,7 +216,7 @@ class _SolarState extends State<Solar> {
               ),
             ),
             SizedBox(
-              width: 64,
+              width: 32,
               child: TextField(
                 controller: numConductorsController,
                 onSubmitted: (_) => compute(),
@@ -214,6 +224,23 @@ class _SolarState extends State<Solar> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: const InputDecoration(
                   labelText: 'num.',
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 64,
+              child: TextField(
+                controller: iSCController,
+                onSubmitted: (_) => compute(),
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                    RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'),
+                  )
+                ],
+                decoration: const InputDecoration(
+                  labelText: 'Isc',
+                  hintText: 'Panel sort-circuit current',
                 ),
               ),
             ),
@@ -251,9 +278,12 @@ class _SolarState extends State<Solar> {
           int.tryParse(numConductorsController.text) ?? numConductors;
       box.put('numConductors', numConductors);
 
+      iSC = double.tryParse(iSCController.text) ?? iSC;
+      box.put('iSC', iSC);
+
       outputText =
           'Single ${cableLength}m conductor resistance:  ${singleConductorResistance().toStringAsPrecision(3)}Ω'
-          '\nGiven max panel current: ${box.get('panelMaxAmps').toStringAsFixed(1)}A, power loss for $numConductors conductors: ${powerLoss(box.get('panelMaxAmps'), singleConductorResistance(), numConductors).toStringAsFixed(1)}W';
+          '\nGiven panel Isc: ${iSC}A, power loss for $numConductors conductors: ${powerLoss(box.get('iSC'), singleConductorResistance(), numConductors).toStringAsFixed(1)}W';
     });
   }
 }
@@ -275,10 +305,6 @@ class _BudgetState extends State<Budget> {
 
   double totalPanelVolts() {
     return numPanels * panelOCV;
-  }
-
-  double panelMaxAmps() {
-    return totalPanelPower() / totalPanelVolts();
   }
 
   double solarChargerMinVolts = 30.0;
@@ -436,8 +462,6 @@ class _BudgetState extends State<Budget> {
       box.put('solarChargerMinVolts', solarChargerMinVolts);
       solarChargerMaxVolts = max;
       box.put('solarChargerMaxVolts', solarChargerMaxVolts);
-
-      box.put('panelMaxAmps', panelMaxAmps());
     });
 
     if (totalPanelVolts() > solarChargerMinVolts &&
@@ -506,10 +530,12 @@ class _BudgetState extends State<Budget> {
           panelVoltageCalc(),
           const Divider(),
           batteryCapacityCalc(),
-          const Divider(),
-          ElevatedButton(
-            onPressed: compute,
-            child: const Text('compute'),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: compute,
+              child: const Text('compute'),
+            ),
           ),
         ],
       ),
