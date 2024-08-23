@@ -130,16 +130,20 @@ class _EnergyBudgetState extends State<EnergyBudget> {
           panelVoltageCalc(),
           const Divider(),
           batteryCapacityCalc(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: compute,
-              child: const Text('compute'),
-            ),
-          ),
+          computeBtn(),
         ],
       ),
     );
+  }
+
+  Padding computeBtn() {
+    return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            onPressed: compute,
+            child: const Text('compute'),
+          ),
+        );
   }
 
   @override
@@ -540,73 +544,93 @@ class _SolarCableState extends State<SolarCable> {
           // crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             cableSelection(),
-            SizedBox(
-              width: 64,
-              child: TextField(
-                controller: cableLengthController,
-                onSubmitted: (_) => compute(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
-                  labelText: 'Length (m)',
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 64,
-              child: TextField(
-                controller: cableTempController,
-                onSubmitted: (_) => compute(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
-                  labelText: '°C',
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 32,
-              child: TextField(
-                controller: numConductorsController,
-                onSubmitted: (_) => compute(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(
-                  labelText: 'num.',
-                ),
-              ),
-            ),
-            SizedBox(
-              width: 64,
-              child: TextField(
-                controller: iSCController,
-                onSubmitted: (_) => compute(),
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(
-                    RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'),
-                  )
-                ],
-                decoration: const InputDecoration(
-                  labelText: 'Isc',
-                  hintText: 'Panel sort-circuit current',
-                ),
-              ),
-            ),
+            cableLengthInput(),
+            cableTempInput(),
+            numConductorsInput(),
+            iSCInput(),
           ],
         ),
-        Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(outputText),
-              ),
-            ),
-          ],
-        ),
+        solarSummary(),
       ],
     );
+  }
+
+  Row solarSummary() {
+    return Row(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(outputText),
+            ),
+          ),
+        ],
+      );
+  }
+
+  SizedBox iSCInput() {
+    return SizedBox(
+            width: 64,
+            child: TextField(
+              controller: iSCController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'),
+                )
+              ],
+              decoration: const InputDecoration(
+                labelText: 'Isc',
+                hintText: 'Panel sort-circuit current',
+              ),
+            ),
+          );
+  }
+
+  SizedBox numConductorsInput() {
+    return SizedBox(
+            width: 32,
+            child: TextField(
+              controller: numConductorsController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'num.',
+              ),
+            ),
+          );
+  }
+
+  SizedBox cableTempInput() {
+    return SizedBox(
+            width: 64,
+            child: TextField(
+              controller: cableTempController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: '°C',
+              ),
+            ),
+          );
+  }
+
+  SizedBox cableLengthInput() {
+    return SizedBox(
+            width: 64,
+            child: TextField(
+              controller: cableLengthController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'Length (m)',
+              ),
+            ),
+          );
   }
 
   DropdownButton<dynamic> cableSelection() {
