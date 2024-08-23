@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'common_widgets.dart';
 
+/// SolarCable computes solar cable losses given cable length, temperature and panel short-circuit current.
 class SolarCable extends StatefulWidget {
   const SolarCable({super.key});
 

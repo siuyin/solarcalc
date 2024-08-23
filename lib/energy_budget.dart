@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'common_widgets.dart';
 
+/// EnergyBudget budgets for daily energy availability given a panel, inverter and battery configuration.
 class EnergyBudget extends StatefulWidget {
   const EnergyBudget({super.key});
 

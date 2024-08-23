@@ -1,17 +1,15 @@
-/// Solar energy calculations.
-library;
-
 import 'package:flutter/material.dart';
 import 'energy_budget.dart';
 import 'solar_cable.dart';
 import 'battery_cable.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const SolarCalcApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+/// SolarCalcApp computes energy budget, solar and battery cable losses.
+class SolarCalcApp extends StatelessWidget {
+  const SolarCalcApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -31,21 +29,21 @@ class MyApp extends StatelessWidget {
               bodyMedium: const TextStyle(fontSize: 16),
             ),
       ),
-      home: const MyHomePage(title: "Solar Power calculations"),
+      home: const SolarCalcHome(title: "Solar Power calculations"),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class SolarCalcHome extends StatefulWidget {
+  const SolarCalcHome({super.key, required this.title});
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<SolarCalcHome> createState() => _SolarCalcHomeState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _SolarCalcHomeState extends State<SolarCalcHome> {
   @override
   void initState() {
     super.initState();
