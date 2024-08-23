@@ -19,12 +19,8 @@ class _EnergyBudgetState extends State<EnergyBudget> with HivePersistence {
     _init();
   }
 
-  // dynamic box;
-
   _init() async {
-    // await Hive.initFlutter();
-    // box = await Hive.openBox('solar');
-    await init();
+    await hiveInit();
 
     setIfEmpty('panelPower', panelPower);
     panelPower = box.get('panelPower');
@@ -289,12 +285,6 @@ class _EnergyBudgetState extends State<EnergyBudget> with HivePersistence {
       ),
     );
   }
-
-  // setIfEmpty(String key, dynamic value) {
-  //   if (box.get(key) != null) return;
-  //   box.put(key, value);
-  //   debugPrint('set $key to $value');
-  // }
 
   compute() {
     checkOpenCircuitVoltage();

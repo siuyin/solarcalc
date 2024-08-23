@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:solar/hive_persistence.dart';
 import 'common_widgets.dart';
 
 /// SolarCable computes solar cable losses given cable length, temperature and panel short-circuit current.
@@ -11,8 +11,7 @@ class SolarCable extends StatefulWidget {
   State<SolarCable> createState() => _SolarCableState();
 }
 
-class _SolarCableState extends State<SolarCable> {
-  dynamic box;
+class _SolarCableState extends State<SolarCable> with HivePersistence {
   String outputText = '';
 
   @override
@@ -21,15 +20,8 @@ class _SolarCableState extends State<SolarCable> {
     _init();
   }
 
-  setIfEmpty(String key, dynamic value) {
-    if (box.get(key) != null) return;
-    box.put(key, value);
-    debugPrint('set $key to $value');
-  }
-
   _init() async {
-    await Hive.initFlutter();
-    box = await Hive.openBox('solar');
+    await hiveInit();
     setIfEmpty('cableCrossSection', 2.5);
     setState(() {
       cableCrossSection = box.get('cableCrossSection');

@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
  mixin HivePersistence {
   dynamic box;
 
-  init() async{
+  hiveInit() async{
     await Hive.initFlutter();
     box = await Hive.openBox('solar');
   }
