@@ -138,12 +138,12 @@ class _EnergyBudgetState extends State<EnergyBudget> {
 
   Padding computeBtn() {
     return Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ElevatedButton(
-            onPressed: compute,
-            child: const Text('compute'),
-          ),
-        );
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        onPressed: compute,
+        child: const Text('compute'),
+      ),
+    );
   }
 
   @override
@@ -551,86 +551,97 @@ class _SolarCableState extends State<SolarCable> {
           ],
         ),
         solarSummary(),
+        computeBtn(),
       ],
+    );
+  }
+
+  Padding computeBtn() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        onPressed: compute,
+        child: const Text('compute'),
+      ),
     );
   }
 
   Row solarSummary() {
     return Row(
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(outputText),
-            ),
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(outputText),
           ),
-        ],
-      );
+        ),
+      ],
+    );
   }
 
   SizedBox iSCInput() {
     return SizedBox(
-            width: 64,
-            child: TextField(
-              controller: iSCController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'),
-                )
-              ],
-              decoration: const InputDecoration(
-                labelText: 'Isc',
-                hintText: 'Panel sort-circuit current',
-              ),
-            ),
-          );
+      width: 64,
+      child: TextField(
+        controller: iSCController,
+        onSubmitted: (_) => compute(),
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(
+            RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'),
+          )
+        ],
+        decoration: const InputDecoration(
+          labelText: 'Isc',
+          hintText: 'Panel sort-circuit current',
+        ),
+      ),
+    );
   }
 
   SizedBox numConductorsInput() {
     return SizedBox(
-            width: 32,
-            child: TextField(
-              controller: numConductorsController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'num.',
-              ),
-            ),
-          );
+      width: 32,
+      child: TextField(
+        controller: numConductorsController,
+        onSubmitted: (_) => compute(),
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          labelText: 'num.',
+        ),
+      ),
+    );
   }
 
   SizedBox cableTempInput() {
     return SizedBox(
-            width: 64,
-            child: TextField(
-              controller: cableTempController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: '°C',
-              ),
-            ),
-          );
+      width: 64,
+      child: TextField(
+        controller: cableTempController,
+        onSubmitted: (_) => compute(),
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          labelText: '°C',
+        ),
+      ),
+    );
   }
 
   SizedBox cableLengthInput() {
     return SizedBox(
-            width: 64,
-            child: TextField(
-              controller: cableLengthController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Length (m)',
-              ),
-            ),
-          );
+      width: 64,
+      child: TextField(
+        controller: cableLengthController,
+        onSubmitted: (_) => compute(),
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          labelText: 'Length (m)',
+        ),
+      ),
+    );
   }
 
   DropdownButton<dynamic> cableSelection() {
@@ -713,8 +724,13 @@ class _BatteryCableState extends State<BatteryCable> {
         Row(
           children: [
             cableSelection(),
+            cableLengthInput(),
+            cableTempInput(),
+            iMaxInput(),
           ],
         ),
+        battSummary(),
+        computeBtn(),
       ],
     );
   }
@@ -774,11 +790,11 @@ class _BatteryCableState extends State<BatteryCable> {
 
       battCableLength =
           double.tryParse(battCableLengthController.text) ?? battCableLength;
-      box.put('cableLength', battCableLength);
+      box.put('battCableLength', battCableLength);
 
       battCableTemp =
           double.tryParse(battCableTempController.text) ?? battCableTemp;
-      box.put('cableTemp', battCableTemp);
+      box.put('battCableTemp', battCableTemp);
 
       battIMax = double.tryParse(battIMaxController.text) ?? battIMax;
       box.put('battIMax', battIMax);
@@ -799,11 +815,11 @@ class _BatteryCableState extends State<BatteryCable> {
       battCableCrossSection = box.get('battCableCrossSection');
     });
 
-    setIfEmpty('cableLength', battCableLength);
-    battCableLengthController.text = box.get('cableLength').toString();
+    setIfEmpty('battCableLength', battCableLength);
+    battCableLengthController.text = box.get('battCableLength').toString();
 
-    setIfEmpty('cableTemp', battCableTemp);
-    battCableTempController.text = box.get('cableTemp').toString();
+    setIfEmpty('battCableTemp', battCableTemp);
+    battCableTempController.text = box.get('battCableTemp').toString();
 
     setIfEmpty('battIMax', battIMax);
     battIMaxController.text = box.get('battIMax').toString();
@@ -834,5 +850,81 @@ class _BatteryCableState extends State<BatteryCable> {
 
   double powerLoss(double i, double r, int n) {
     return i * i * r * n;
+  }
+
+  SizedBox cableLengthInput() {
+    return SizedBox(
+      width: 64,
+      child: TextField(
+        controller: battCableLengthController,
+        onSubmitted: (_) => compute(),
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(
+            RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'),
+          )
+        ],
+        decoration: const InputDecoration(
+          labelText: 'Length (m)',
+        ),
+      ),
+    );
+  }
+
+  SizedBox cableTempInput() {
+    return SizedBox(
+      width: 64,
+      child: TextField(
+        controller: battCableTempController,
+        onSubmitted: (_) => compute(),
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          labelText: '°C',
+        ),
+      ),
+    );
+  }
+
+  SizedBox iMaxInput() {
+    return SizedBox(
+      width: 64,
+      child: TextField(
+        controller: battIMaxController,
+        onSubmitted: (_) => compute(),
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(
+            RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'),
+          )
+        ],
+        decoration: const InputDecoration(
+          labelText: 'IMax',
+        ),
+      ),
+    );
+  }
+
+  Row battSummary() {
+    return Row(
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(outputText),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Padding computeBtn() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        onPressed: compute,
+        child: const Text('compute'),
+      ),
+    );
   }
 }
