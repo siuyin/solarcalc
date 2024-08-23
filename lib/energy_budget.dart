@@ -128,24 +128,19 @@ class _EnergyBudgetState extends State<EnergyBudget> {
   }
 
   Padding panelPowerCalc() {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: TextField(
-              onSubmitted: (_) => compute(),
-              controller: panelPowerController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Panel power',
-              ),
-            ),
-          ),
-          const Text(' W-peak x '),
-          Expanded(
+    var panelPower = Expanded(
+      flex: 1,
+      child: TextField(
+        onSubmitted: (_) => compute(),
+        controller: panelPowerController,
+        keyboardType: TextInputType.number,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: const InputDecoration(
+          labelText: 'Panel power',
+        ),
+      ),
+    );
+    var numPanels = Expanded(
             flex: 1,
             child: TextField(
               controller: numPanelsController,
@@ -156,25 +151,30 @@ class _EnergyBudgetState extends State<EnergyBudget> {
                 labelText: 'n',
               ),
             ),
-          ),
-          Expanded(
+          );
+    var panelSummary = Expanded(
             flex: 4,
             child: Text(
               '${totalPanelPower()} W-peak.'
               '\nEst. ${(wattHoursPerDay() / 1000).toStringAsPrecision(floatPrecision)} kWh/day',
               textAlign: TextAlign.left,
             ),
-          ),
+          );
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+        children: [
+          panelPower,
+          const Text(' W-peak x '),
+          numPanels,
+          panelSummary,
         ],
       ),
     );
   }
 
   Padding panelVoltageCalc() {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Row(children: [
-        Expanded(
+    var panelOpenCircuitVolts = Expanded(
           flex: 1,
           child: TextField(
             onSubmitted: (_) => compute(),
@@ -188,8 +188,8 @@ class _EnergyBudgetState extends State<EnergyBudget> {
               labelText: 'Panel Voc',
             ),
           ),
-        ),
-        Expanded(
+        );
+    var solarInverterMinVolts = Expanded(
           flex: 1,
           child: TextField(
             onSubmitted: (_) => compute(),
@@ -203,8 +203,8 @@ class _EnergyBudgetState extends State<EnergyBudget> {
               labelText: 'minV',
             ),
           ),
-        ),
-        Expanded(
+        );
+    var solarInverterMaxVolts = Expanded(
           flex: 1,
           child: TextField(
             onSubmitted: (_) => checkOpenCircuitVoltage(),
@@ -218,21 +218,24 @@ class _EnergyBudgetState extends State<EnergyBudget> {
               labelText: 'maxV',
             ),
           ),
-        ),
-        Expanded(
+        );
+    var voltageCompatibilitySummary = Expanded(
           flex: 1,
           child: openCircuitVoltageConfig,
-        ),
+        );
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(children: [
+        panelOpenCircuitVolts,
+        solarInverterMinVolts,
+        solarInverterMaxVolts,
+        voltageCompatibilitySummary,
       ]),
     );
   }
 
   Padding batteryCapacityCalc() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
+    var numCells = Expanded(
             flex: 1,
             child: TextField(
               controller: numCellsController,
@@ -243,8 +246,8 @@ class _EnergyBudgetState extends State<EnergyBudget> {
                 labelText: 'num cells',
               ),
             ),
-          ),
-          Expanded(
+          );
+    var cellCapacity = Expanded(
             flex: 1,
             child: TextField(
               controller: cellCapacityController,
@@ -258,11 +261,18 @@ class _EnergyBudgetState extends State<EnergyBudget> {
                 labelText: 'cell capacity',
               ),
             ),
-          ),
-          Expanded(
+          );
+    var battInfoSummary = Expanded(
             flex: 2,
             child: batteryInfo,
-          ),
+          );
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          numCells,
+          cellCapacity,
+          battInfoSummary,
         ],
       ),
     );
@@ -289,7 +299,6 @@ class _EnergyBudgetState extends State<EnergyBudget> {
     updatePowerCalc();
     updateBatteryCalc();
   }
-
 
   bool updateBatteryCalc() {
     final nc = int.tryParse(numCellsController.text);
@@ -398,7 +407,4 @@ class _EnergyBudgetState extends State<EnergyBudget> {
       box.put('panelPower', panelPower);
     });
   }
-
-
-
 }
