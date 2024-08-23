@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:solar/hive_persistence.dart';
 import 'common_widgets.dart';
 
 class BatteryCable extends StatefulWidget {
@@ -10,7 +10,7 @@ class BatteryCable extends StatefulWidget {
   State<BatteryCable> createState() => _BatteryCableState();
 }
 
-class _BatteryCableState extends State<BatteryCable> {
+class _BatteryCableState extends State<BatteryCable> with HivePersistence {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -104,11 +104,8 @@ class _BatteryCableState extends State<BatteryCable> {
     });
   }
 
-  dynamic box;
-
   _init() async {
-    await Hive.initFlutter();
-    box = await Hive.openBox('solar');
+    await hiveInit();
     setIfEmpty('battCableCrossSection', 25.0);
     setState(() {
       battCableCrossSection = box.get('battCableCrossSection');
@@ -128,12 +125,6 @@ class _BatteryCableState extends State<BatteryCable> {
   void initState() {
     super.initState();
     _init();
-  }
-
-  setIfEmpty(String key, dynamic value) {
-    if (box.get(key) != null) return;
-    box.put(key, value);
-    debugPrint('set $key to $value');
   }
 
   double temperatureCorrectedCopperResistivity() {
