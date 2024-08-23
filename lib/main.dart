@@ -126,9 +126,7 @@ class _EnergyBudgetState extends State<EnergyBudget> {
         children: [
           const Heading(title: 'Energy Budget'),
           panelPowerCalc(),
-          const Divider(),
           panelVoltageCalc(),
-          const Divider(),
           batteryCapacityCalc(),
           computeBtn(),
         ],
@@ -323,135 +321,144 @@ class _EnergyBudgetState extends State<EnergyBudget> {
     });
   }
 
-  Row batteryCapacityCalc() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: TextField(
-            controller: numCellsController,
-            onSubmitted: (_) => compute(),
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              labelText: 'num cells',
+  Padding batteryCapacityCalc() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: TextField(
+              controller: numCellsController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'num cells',
+              ),
             ),
           ),
-        ),
+          Expanded(
+            flex: 1,
+            child: TextField(
+              controller: cellCapacityController,
+              keyboardType: TextInputType.number,
+              onSubmitted: (_) => compute(),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+              ],
+              decoration: const InputDecoration(
+                labelText: 'cell capacity',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: batteryInfo,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding panelVoltageCalc() {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(children: [
         Expanded(
           flex: 1,
           child: TextField(
-            controller: cellCapacityController,
-            keyboardType: TextInputType.number,
             onSubmitted: (_) => compute(),
+            controller: panelOCVController,
+            keyboardType: TextInputType.number,
             inputFormatters: [
               FilteringTextInputFormatter.allow(
                   RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
             ],
             decoration: const InputDecoration(
-              labelText: 'cell capacity',
+              labelText: 'Panel Voc',
             ),
           ),
         ),
         Expanded(
-          flex: 2,
-          child: batteryInfo,
+          flex: 1,
+          child: TextField(
+            onSubmitted: (_) => compute(),
+            controller: solarChargerMinVoltsController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+            ],
+            decoration: const InputDecoration(
+              labelText: 'minV',
+            ),
+          ),
         ),
-      ],
+        Expanded(
+          flex: 1,
+          child: TextField(
+            onSubmitted: (_) => checkOpenCircuitVoltage(),
+            controller: solarChargerMaxVoltsController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+            ],
+            decoration: const InputDecoration(
+              labelText: 'maxV',
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: openCircuitVoltageConfig,
+        ),
+      ]),
     );
   }
 
-  Row panelVoltageCalc() {
-    return Row(children: [
-      Expanded(
-        flex: 1,
-        child: TextField(
-          onSubmitted: (_) => compute(),
-          controller: panelOCVController,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(
-                RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-          ],
-          decoration: const InputDecoration(
-            labelText: 'Panel Voc',
-          ),
-        ),
-      ),
-      Expanded(
-        flex: 1,
-        child: TextField(
-          onSubmitted: (_) => compute(),
-          controller: solarChargerMinVoltsController,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(
-                RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-          ],
-          decoration: const InputDecoration(
-            labelText: 'minV',
-          ),
-        ),
-      ),
-      Expanded(
-        flex: 1,
-        child: TextField(
-          onSubmitted: (_) => checkOpenCircuitVoltage(),
-          controller: solarChargerMaxVoltsController,
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(
-                RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-          ],
-          decoration: const InputDecoration(
-            labelText: 'maxV',
-          ),
-        ),
-      ),
-      Expanded(
-        flex: 1,
-        child: openCircuitVoltageConfig,
-      ),
-    ]);
-  }
-
-  Row panelPowerCalc() {
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: TextField(
-            onSubmitted: (_) => compute(),
-            controller: panelPowerController,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              labelText: 'Panel power',
+  Padding panelPowerCalc() {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: TextField(
+              onSubmitted: (_) => compute(),
+              controller: panelPowerController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'Panel power',
+              ),
             ),
           ),
-        ),
-        const Text(' W-peak x '),
-        Expanded(
-          flex: 1,
-          child: TextField(
-            controller: numPanelsController,
-            onSubmitted: (_) => compute(),
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              labelText: 'n',
+          const Text(' W-peak x '),
+          Expanded(
+            flex: 1,
+            child: TextField(
+              controller: numPanelsController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'n',
+              ),
             ),
           ),
-        ),
-        Expanded(
-          flex: 4,
-          child: Text(
-            '${totalPanelPower()} W-peak.'
-            '\nEst. ${(wattHoursPerDay() / 1000).toStringAsPrecision(floatPrecision)} kWh/day',
-            textAlign: TextAlign.left,
+          Expanded(
+            flex: 4,
+            child: Text(
+              '${totalPanelPower()} W-peak.'
+              '\nEst. ${(wattHoursPerDay() / 1000).toStringAsPrecision(floatPrecision)} kWh/day',
+              textAlign: TextAlign.left,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -540,15 +547,18 @@ class _SolarCableState extends State<SolarCable> {
       children: [
         const Divider(),
         const Heading(title: 'Solar Cable'),
-        Row(
-          // crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            cableSelection(),
-            cableLengthInput(),
-            cableTempInput(),
-            numConductorsInput(),
-            iSCInput(),
-          ],
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            // crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              cableSelection(),
+              cableLengthInput(),
+              cableTempInput(),
+              numConductorsInput(),
+              iSCInput(),
+            ],
+          ),
         ),
         solarSummary(),
         computeBtn(),
@@ -721,13 +731,16 @@ class _BatteryCableState extends State<BatteryCable> {
       children: [
         const Divider(),
         const Heading(title: 'Battery Cable'),
-        Row(
-          children: [
-            cableSelection(),
-            cableLengthInput(),
-            cableTempInput(),
-            iMaxInput(),
-          ],
+        Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            children: [
+              cableSelection(),
+              cableLengthInput(),
+              cableTempInput(),
+              iMaxInput(),
+            ],
+          ),
         ),
         battSummary(),
         computeBtn(),
