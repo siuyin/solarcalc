@@ -67,6 +67,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+// -------------------------------------------------------------
+
 class EnergyBudget extends StatefulWidget {
   const EnergyBudget({super.key});
 
@@ -75,6 +77,51 @@ class EnergyBudget extends StatefulWidget {
 }
 
 class _EnergyBudgetState extends State<EnergyBudget> {
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  dynamic box;
+
+  _init() async {
+    await Hive.initFlutter();
+    box = await Hive.openBox('solar');
+
+    setIfEmpty('panelPower', panelPower);
+    panelPower = box.get('panelPower');
+    panelPowerController.text = box.get('panelPower').toString();
+
+    setIfEmpty('numPanels', numPanels);
+    numPanels = box.get('numPanels');
+    numPanelsController.text = box.get('numPanels').toString();
+
+    setIfEmpty('panelOCV', panelOCV);
+    panelOCV = box.get('panelOCV');
+    panelOCVController.text = box.get('panelOCV').toString();
+
+    setIfEmpty('solarChargerMinVolts', solarChargerMinVolts);
+    solarChargerMinVolts = box.get('solarChargerMinVolts');
+    solarChargerMinVoltsController.text =
+        box.get('solarChargerMinVolts').toString();
+
+    setIfEmpty('solarChargerMaxVolts', solarChargerMaxVolts);
+    solarChargerMaxVolts = box.get('solarChargerMaxVolts');
+    solarChargerMaxVoltsController.text =
+        box.get('solarChargerMaxVolts').toString();
+
+    setIfEmpty('numCells', numCells);
+    numCells = box.get('numCells');
+    numCellsController.text = box.get('numCells').toString();
+
+    setIfEmpty('ampHoursPerCell', ampHoursPerCell);
+    ampHoursPerCell = box.get('ampHoursPerCell');
+    cellCapacityController.text = box.get('ampHoursPerCell').toString();
+
+    compute();
+  }
+
   int numPanels = 1;
   double panelPower = 100;
   double panelOCV = 22.1;
@@ -116,7 +163,18 @@ class _EnergyBudgetState extends State<EnergyBudget> {
   final numCellsController = TextEditingController();
   final cellCapacityController = TextEditingController();
 
-  dynamic box;
+  Text batteryInfo = const Text('batt info');
+  double battMaxPower() {
+    return ampHoursPerCell * voltsPerCell * numCells;
+  }
+
+  double battMaxAmps() {
+    return ampHoursPerCell * 1.0; // 1.0C
+  }
+
+  double totalBatteryVolts() {
+    return voltsPerCell * numCells;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +192,147 @@ class _EnergyBudgetState extends State<EnergyBudget> {
     );
   }
 
+  Padding panelPowerCalc() {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: TextField(
+              onSubmitted: (_) => compute(),
+              controller: panelPowerController,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'Panel power',
+              ),
+            ),
+          ),
+          const Text(' W-peak x '),
+          Expanded(
+            flex: 1,
+            child: TextField(
+              controller: numPanelsController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'n',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 4,
+            child: Text(
+              '${totalPanelPower()} W-peak.'
+              '\nEst. ${(wattHoursPerDay() / 1000).toStringAsPrecision(floatPrecision)} kWh/day',
+              textAlign: TextAlign.left,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding panelVoltageCalc() {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Row(children: [
+        Expanded(
+          flex: 1,
+          child: TextField(
+            onSubmitted: (_) => compute(),
+            controller: panelOCVController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+            ],
+            decoration: const InputDecoration(
+              labelText: 'Panel Voc',
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: TextField(
+            onSubmitted: (_) => compute(),
+            controller: solarChargerMinVoltsController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+            ],
+            decoration: const InputDecoration(
+              labelText: 'minV',
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: TextField(
+            onSubmitted: (_) => checkOpenCircuitVoltage(),
+            controller: solarChargerMaxVoltsController,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(
+                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+            ],
+            decoration: const InputDecoration(
+              labelText: 'maxV',
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 1,
+          child: openCircuitVoltageConfig,
+        ),
+      ]),
+    );
+  }
+
+  Padding batteryCapacityCalc() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 1,
+            child: TextField(
+              controller: numCellsController,
+              onSubmitted: (_) => compute(),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              decoration: const InputDecoration(
+                labelText: 'num cells',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: TextField(
+              controller: cellCapacityController,
+              keyboardType: TextInputType.number,
+              onSubmitted: (_) => compute(),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                    RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
+              ],
+              decoration: const InputDecoration(
+                labelText: 'cell capacity',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: batteryInfo,
+          ),
+        ],
+      ),
+    );
+  }
+
   Padding computeBtn() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -142,49 +341,6 @@ class _EnergyBudgetState extends State<EnergyBudget> {
         child: const Text('compute'),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
-
-  _init() async {
-    await Hive.initFlutter();
-    box = await Hive.openBox('solar');
-
-    setIfEmpty('panelPower', panelPower);
-    panelPower = box.get('panelPower');
-    panelPowerController.text = box.get('panelPower').toString();
-
-    setIfEmpty('numPanels', numPanels);
-    numPanels = box.get('numPanels');
-    numPanelsController.text = box.get('numPanels').toString();
-
-    setIfEmpty('panelOCV', panelOCV);
-    panelOCV = box.get('panelOCV');
-    panelOCVController.text = box.get('panelOCV').toString();
-
-    setIfEmpty('solarChargerMinVolts', solarChargerMinVolts);
-    solarChargerMinVolts = box.get('solarChargerMinVolts');
-    solarChargerMinVoltsController.text =
-        box.get('solarChargerMinVolts').toString();
-
-    setIfEmpty('solarChargerMaxVolts', solarChargerMaxVolts);
-    solarChargerMaxVolts = box.get('solarChargerMaxVolts');
-    solarChargerMaxVoltsController.text =
-        box.get('solarChargerMaxVolts').toString();
-
-    setIfEmpty('numCells', numCells);
-    numCells = box.get('numCells');
-    numCellsController.text = box.get('numCells').toString();
-
-    setIfEmpty('ampHoursPerCell', ampHoursPerCell);
-    ampHoursPerCell = box.get('ampHoursPerCell');
-    cellCapacityController.text = box.get('ampHoursPerCell').toString();
-
-    compute();
   }
 
   setIfEmpty(String key, dynamic value) {
@@ -199,19 +355,6 @@ class _EnergyBudgetState extends State<EnergyBudget> {
     updateBatteryCalc();
   }
 
-  Text batteryInfo = const Text('batt info');
-
-  double battMaxPower() {
-    return ampHoursPerCell * voltsPerCell * numCells;
-  }
-
-  double battMaxAmps() {
-    return ampHoursPerCell * 1.0; // 1.0C
-  }
-
-  double totalBatteryVolts() {
-    return voltsPerCell * numCells;
-  }
 
   bool updateBatteryCalc() {
     final nc = int.tryParse(numCellsController.text);
@@ -321,146 +464,8 @@ class _EnergyBudgetState extends State<EnergyBudget> {
     });
   }
 
-  Padding batteryCapacityCalc() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: TextField(
-              controller: numCellsController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'num cells',
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: TextField(
-              controller: cellCapacityController,
-              keyboardType: TextInputType.number,
-              onSubmitted: (_) => compute(),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                    RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-              ],
-              decoration: const InputDecoration(
-                labelText: 'cell capacity',
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: batteryInfo,
-          ),
-        ],
-      ),
-    );
-  }
 
-  Padding panelVoltageCalc() {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Row(children: [
-        Expanded(
-          flex: 1,
-          child: TextField(
-            onSubmitted: (_) => compute(),
-            controller: panelOCVController,
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(
-                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-            ],
-            decoration: const InputDecoration(
-              labelText: 'Panel Voc',
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: TextField(
-            onSubmitted: (_) => compute(),
-            controller: solarChargerMinVoltsController,
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(
-                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-            ],
-            decoration: const InputDecoration(
-              labelText: 'minV',
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: TextField(
-            onSubmitted: (_) => checkOpenCircuitVoltage(),
-            controller: solarChargerMaxVoltsController,
-            keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(
-                  RegExp(r'[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)'))
-            ],
-            decoration: const InputDecoration(
-              labelText: 'maxV',
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: openCircuitVoltageConfig,
-        ),
-      ]),
-    );
-  }
 
-  Padding panelPowerCalc() {
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 1,
-            child: TextField(
-              onSubmitted: (_) => compute(),
-              controller: panelPowerController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'Panel power',
-              ),
-            ),
-          ),
-          const Text(' W-peak x '),
-          Expanded(
-            flex: 1,
-            child: TextField(
-              controller: numPanelsController,
-              onSubmitted: (_) => compute(),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(
-                labelText: 'n',
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Text(
-              '${totalPanelPower()} W-peak.'
-              '\nEst. ${(wattHoursPerDay() / 1000).toStringAsPrecision(floatPrecision)} kWh/day',
-              textAlign: TextAlign.left,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class SolarCable extends StatefulWidget {
@@ -514,6 +519,7 @@ class _SolarCableState extends State<SolarCable> {
     ('1.5mm²', 1.5),
     ('2.5mm²', 2.5),
     ('4mm²', 4.0),
+    ('6mm²', 6.0),
     ('16AWG', 1.31),
     ('14AWG', 2.08),
     ('12AWG', 3.31),
