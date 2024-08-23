@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+// import 'package:hive_flutter/hive_flutter.dart';
+import 'package:solar/hive_persistence.dart';
 import 'common_widgets.dart';
 
 /// EnergyBudget budgets for daily energy availability given a panel, inverter and battery configuration.
@@ -11,18 +12,19 @@ class EnergyBudget extends StatefulWidget {
   State<EnergyBudget> createState() => _EnergyBudgetState();
 }
 
-class _EnergyBudgetState extends State<EnergyBudget> {
+class _EnergyBudgetState extends State<EnergyBudget> with HivePersistence {
   @override
   void initState() {
     super.initState();
     _init();
   }
 
-  dynamic box;
+  // dynamic box;
 
   _init() async {
-    await Hive.initFlutter();
-    box = await Hive.openBox('solar');
+    // await Hive.initFlutter();
+    // box = await Hive.openBox('solar');
+    await init();
 
     setIfEmpty('panelPower', panelPower);
     panelPower = box.get('panelPower');
@@ -288,11 +290,11 @@ class _EnergyBudgetState extends State<EnergyBudget> {
     );
   }
 
-  setIfEmpty(String key, dynamic value) {
-    if (box.get(key) != null) return;
-    box.put(key, value);
-    debugPrint('set $key to $value');
-  }
+  // setIfEmpty(String key, dynamic value) {
+  //   if (box.get(key) != null) return;
+  //   box.put(key, value);
+  //   debugPrint('set $key to $value');
+  // }
 
   compute() {
     checkOpenCircuitVoltage();
