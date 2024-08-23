@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// import 'package:hive_flutter/hive_flutter.dart';
 import 'package:solar/hive_persistence.dart';
 import 'common_widgets.dart';
 
