@@ -217,4 +217,12 @@ class _BatteryCableState extends State<BatteryCable> with HivePersistence {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    battCableLengthController.dispose();
+    battCableTempController.dispose();
+    battIMaxController.dispose();
+    super.dispose();
+  }
 }

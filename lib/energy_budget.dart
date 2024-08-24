@@ -398,4 +398,16 @@ class _EnergyBudgetState extends State<EnergyBudget> with HivePersistence {
       box.put('panelPower', panelPower);
     });
   }
+
+  @override
+  dispose(){
+    panelPowerController.dispose();
+    numPanelsController.dispose();
+    panelOCVController.dispose();
+    solarChargerMinVoltsController.dispose();
+    solarChargerMaxVoltsController.dispose();
+    numCellsController.dispose();
+    cellCapacityController.dispose();
+    super.dispose();
+  }
 }

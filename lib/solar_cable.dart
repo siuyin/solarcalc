@@ -233,4 +233,13 @@ class _SolarCableState extends State<SolarCable> with HivePersistence {
           '\nGiven panel Isc: ${iSC}A, power loss for $numConductors conductors: ${powerLoss(box.get('iSC'), singleConductorResistance(), numConductors).toStringAsFixed(1)}W';
     });
   }
+
+@override
+void dispose() {
+  cableTempController.dispose();
+  cableLengthController.dispose();
+  numConductorsController.dispose();
+  iSCController.dispose();
+    super.dispose();
+  }
 }
